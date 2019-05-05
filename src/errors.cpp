@@ -247,7 +247,7 @@ PyObject* GetErrorFromHandle(Connection *conn, const char* szFunction, HDBC hdbc
     SQLSMALLINT cchMsg;
 
     ODBCCHAR sqlstateT[6];
-    ODBCCHAR szMsg[1024];
+    ODBCCHAR szMsg[2048];
 
     if (hstmt != SQL_NULL_HANDLE)
     {
@@ -281,7 +281,7 @@ PyObject* GetErrorFromHandle(Connection *conn, const char* szFunction, HDBC hdbc
 
         SQLRETURN ret;
         Py_BEGIN_ALLOW_THREADS
-        ret = SQLGetDiagRecW(nHandleType, h, iRecord, (SQLWCHAR*)sqlstateT, &nNativeError, (SQLWCHAR*)szMsg, (short)(_countof(szMsg)-1), &cchMsg);
+        ret = SQLGetDiagRecW(nHandleType, h, iRecord, (SQLWCHAR*)sqlstateT, &nNativeError, (SQLWCHAR*)szMsg, (short)(_countof(szMsg)-1) * 2, &cchMsg);
         Py_END_ALLOW_THREADS
         if (!SQL_SUCCEEDED(ret))
             break;
@@ -347,8 +347,8 @@ PyObject* GetErrorFromHandle(Connection *conn, const char* szFunction, HDBC hdbc
 
 static bool GetSqlState(HSTMT hstmt, char* szSqlState)
 {
-    SQLCHAR szMsg[300];
-    SQLSMALLINT cbMsg = (SQLSMALLINT)(_countof(szMsg) - 1);
+    SQLCHAR szMsg[2048];
+    SQLSMALLINT cbMsg = (SQLSMALLINT)(_countof(szMsg) - 1) * 2;
     SQLINTEGER nNative;
     SQLSMALLINT cchMsg;
     SQLRETURN ret;
